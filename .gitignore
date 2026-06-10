@@ -42,3 +42,11 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# claude code local config and memory
+/.claude/settings.local.json
+/memory/
+
+# editor swap files
+*.swp
+*.swo
