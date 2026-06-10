@@ -54,6 +54,38 @@ export async function createMeal(
   return meal
 }
 
+export async function updateMealMeta(
+  userId: string,
+  mealId: string,
+  input: { name: string; loggedAt: string }
+) {
+  await db
+    .update(meals)
+    .set({ name: input.name, loggedAt: new Date(input.loggedAt), updatedAt: new Date() })
+    .where(and(eq(meals.id, mealId), eq(meals.userId, userId)))
+}
+
+export async function addFoodItemToMeal(
+  userId: string,
+  mealId: string,
+  input: { name: string; calories?: number }
+) {
+  const meal = await getMealById(userId, mealId)
+  if (!meal) throw new Error("Meal not found")
+  const [item] = await db.insert(foodItems).values({ mealId, ...input }).returning()
+  return item
+}
+
+export async function deleteFoodItem(
+  userId: string,
+  mealId: string,
+  foodItemId: string
+) {
+  const meal = await getMealById(userId, mealId)
+  if (!meal) throw new Error("Meal not found")
+  await db.delete(foodItems).where(and(eq(foodItems.id, foodItemId), eq(foodItems.mealId, mealId)))
+}
+
 export async function getMealsForUser(userId: string, date: Date) {
   const start = new Date(date)
   start.setHours(0, 0, 0, 0)
